@@ -46,6 +46,10 @@ public class SAXParserTown extends MySAXParser {
     public void endElement(String uri, String local_name, String qName) throws SAXException {
 
         if ("place".equals(local_name)) {
+            while (town.name.charAt(town.name.length() - 1) == '\n' ||
+                    town.name.charAt(town.name.length() - 1) == '\r' ||
+                    town.name.charAt(town.name.length() - 1) == ' ')
+                town.name = town.name.substring(0, town.name.length() - 1);
             array.add(town);
             town = new Town();
         }
@@ -68,7 +72,7 @@ public class SAXParserTown extends MySAXParser {
         if ("woeid".equals(currentElement))
             town.woeid = value;
         else if (types.contains(currentElement))
-            town.name += currentType + " - " + value + " ";
+            town.name += currentType + " - " + value + " \r\n";
     }
 
 }

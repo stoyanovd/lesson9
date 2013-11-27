@@ -12,7 +12,7 @@
     <string name="LastUpdateTextView">Last update:</string>
     <string name="UpdateThisChannelButton">Update this town</string>
     <string name="ErrorWithInternet">Some towns can not be updated</string>
-    <string name="ErrorChannel">Some strange error - town </string>
+    <string name="ErrorChannel">Some strange error - town</string>
     <string name="UpdateOneChannel">Successful update of</string>
     <string name="HintHttp">Do not forget to type http:// prefix</string>
     <string name="FindTowns">Find</string>
@@ -26,4 +26,5 @@
     <string name="YesDelete">Yes</string>
     <string name="NoDelete">No</string>
     <string name="IfDelete">Delete this town?</string>
+    <string name="TownsDownload">You see all results</string>
 </resources>

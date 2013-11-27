@@ -20,7 +20,7 @@ public class MyDataBaseTownHelper extends SQLiteOpenHelper {
     public static final String CLOUDS = "clouds";
     public static final String IMAGE = "image";
 
-    public int town_id;
+    public String town_woeid = "";
 
     public static final String CREATE_DATABASE_BEFORE_ID = "CREATE TABLE " + DATABASE_NAME_NO_ID;
 
@@ -32,20 +32,21 @@ public class MyDataBaseTownHelper extends SQLiteOpenHelper {
 
     public static final String DROP_DATABASE_NO_ID = "DROP TABLE IF EXISTS " + DATABASE_NAME_NO_ID;
 
-    public MyDataBaseTownHelper(Context context, int id) {
-        super(context, DATABASE_NAME_NO_ID + id, null, DATABASE_VERSION);
-        town_id = id;
+    public MyDataBaseTownHelper(Context context, String woeid) {
+        super(context, DATABASE_NAME_NO_ID + woeid, null, DATABASE_VERSION);
+        town_woeid = woeid;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_DATABASE_BEFORE_ID + town_id + CREATE_DATABASE_AFTER_ID);
+        System.out.println("sq create =" + town_woeid);
+        db.execSQL(CREATE_DATABASE_BEFORE_ID + town_woeid + CREATE_DATABASE_AFTER_ID);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (newVersion != oldVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME_NO_ID + town_id);
+            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME_NO_ID + town_woeid);
             onCreate(db);
         }
     }

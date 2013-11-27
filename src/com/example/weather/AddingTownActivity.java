@@ -10,12 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParserException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class AddingTownActivity extends Activity {
@@ -40,6 +35,7 @@ public class AddingTownActivity extends Activity {
 
             Town item = getItem(position);
             TextView itemView = new TextView(context);
+            itemView.setMaxLines(10);
             itemView.setTextSize(30);
             itemView.setTextColor(Color.GREEN);
             if (item != null) {
@@ -66,7 +62,7 @@ public class AddingTownActivity extends Activity {
             ContentValues contentValues = new ContentValues();
             contentValues.put(MyDataBaseHelper.NAME, town.name);
             contentValues.put(MyDataBaseHelper.WOEID, town.woeid);
-            contentValues.put(MyDataBaseHelper._ID, id);
+            //contentValues.put(MyDataBaseHelper._ID, id);
 
             sqLiteDatabase.insert(MyDataBaseHelper.DATABASE_NAME, null, contentValues);
 
@@ -89,7 +85,7 @@ public class AddingTownActivity extends Activity {
 
         protected void onPostExecute(Boolean result) {
 
-            if(!result)
+            if (!result)
                 return;
             array = new ArrayList<Town>();
             for (int i = 0; i < saxParserTown.array.size(); i++)
@@ -100,6 +96,8 @@ public class AddingTownActivity extends Activity {
             listView = (ListView) findViewById(R.id.listViewAdding);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(adding);
+
+            Toast.makeText(getApplicationContext(), R.string.TownsDownload, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -118,7 +116,6 @@ public class AddingTownActivity extends Activity {
             }
         }
     };
-
 
 
     @Override

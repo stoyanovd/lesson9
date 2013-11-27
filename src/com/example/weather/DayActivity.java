@@ -2,6 +2,8 @@ package com.example.weather;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.format.Time;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,10 +30,30 @@ public class DayActivity extends Activity {
         TextView textViewNameFull = (TextView) findViewById(R.id.textViewNameFull);
         ImageView imageView = (ImageView) findViewById(R.id.imageViewFull);
 
-        textViewDate.setText(getIntent().getStringExtra(Day.DATE));
+        TextView textViewHumidityText = (TextView) findViewById(R.id.textViewHumidityText);
+        TextView textViewPressureText = (TextView) findViewById(R.id.textViewPressureText);
+        TextView textViewWindDirectionText = (TextView) findViewById(R.id.textViewWindDirectionText);
+        TextView textViewWindSpeedText = (TextView) findViewById(R.id.textViewWindSpeedText);
+
+        Time time = new Time();
+        time.set(Long.parseLong(getIntent().getStringExtra(Day.DATE)));
+        textViewDate.setText(time.format3339(true));
+
         textViewHumidity.setText(getIntent().getStringExtra(Day.HUMIDITY));
         textViewPressure.setText(getIntent().getStringExtra(Day.PRESSURE));
         textViewWindDirection.setText(getIntent().getStringExtra(Day.WIND_DIRECTION));
+        if (getIntent().getStringExtra(Day.HUMIDITY) == null || "".equals(getIntent().getStringExtra(Day.HUMIDITY)))
+            textViewHumidityText.setVisibility(View.INVISIBLE);
+
+        if (getIntent().getStringExtra(Day.PRESSURE) == null || "".equals(getIntent().getStringExtra(Day.PRESSURE)))
+            textViewPressureText.setVisibility(View.INVISIBLE);
+
+        if (getIntent().getStringExtra(Day.WIND_DIRECTION) == null || "".equals(getIntent().getStringExtra(Day.WIND_DIRECTION)))
+            textViewWindDirectionText.setVisibility(View.INVISIBLE);
+
+        if (getIntent().getStringExtra(Day.WIND_SPEED) == null || "".equals(getIntent().getStringExtra(Day.WIND_SPEED)))
+            textViewWindSpeedText.setVisibility(View.INVISIBLE);
+
         textViewWindFull.setText(getIntent().getStringExtra(Day.WIND_SPEED));
         textViewLowFull.setText(getIntent().getStringExtra(Day.LOW_TEMPERATURE));
         textViewHighFull.setText(getIntent().getStringExtra(Day.HIGH_TEMPERATURE));

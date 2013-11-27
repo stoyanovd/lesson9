@@ -39,6 +39,7 @@ public class MyActivity extends Activity {
             Town item = getItem(position);
             TextView itemView = new TextView(context);
             itemView.setTextSize(30);
+            itemView.setMaxLines(10);
             itemView.setTextColor(Color.GREEN);
             if (item != null) {
                 itemView.setText(item.name);
@@ -60,34 +61,57 @@ public class MyActivity extends Activity {
     };
 
 
+    public class MyAlertDialogFragment extends DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.IfDelete)
+                    .setPositiveButton(R.string.YesDelete,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    if ("".equals(getIntent().getStringExtra(Town.WOEID)) || null == getIntent().getStringExtra(Town.WOEID))
+                                        return;
+
+                                    MyDataBaseTownHelper myDataBaseTownHelper = new MyDataBaseTownHelper(getApplicationContext(), getIntent().getStringExtra(Town.WOEID));
+                                    SQLiteDatabase sqLiteDatabase = myDataBaseTownHelper.getWritableDatabase();
+                                    sqLiteDatabase.execSQL(MyDataBaseTownHelper.DROP_DATABASE_NO_ID + getIntent().getStringExtra(Town.WOEID));
+                                    sqLiteDatabase.close();
+                                    myDataBaseTownHelper.close();
+
+                                    MyDataBaseHelper myDataBaseHelper = new MyDataBaseHelper(getApplicationContext());
+                                    sqLiteDatabase = myDataBaseHelper.getWritableDatabase();
+                                    sqLiteDatabase.delete(MyDataBaseHelper.DATABASE_NAME, MyDataBaseHelper.WOEID + "=" + getIntent().getStringExtra(Town.WOEID), null);
+                                    sqLiteDatabase.close();
+                                    myDataBaseHelper.close();
+                                    fillingArraysAndAdapter();
+                                }
+                            }
+                    )
+                    .setNegativeButton(R.string.NoDelete,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                }
+                            }
+                    )
+                    .setCancelable(true)
+                    .create();
+        }
+    }
+
+
     public AdapterView.OnItemLongClickListener deleteTown = new AdapterView.OnItemLongClickListener() {
         public boolean onItemLongClick(AdapterView parent, View v, int position, long id) {
 
-
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-
-            builder.setPositiveButton(R.string.YesDelete, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-
-                    MyDataBaseTownHelper myDataBaseTownHelper = new MyDataBaseTownHelper(getApplicationContext(), array.get(id).id);
-                    SQLiteDatabase sqLiteDatabase = myDataBaseTownHelper.getWritableDatabase();
-                    sqLiteDatabase.execSQL(MyDataBaseTownHelper.DROP_DATABASE_NO_ID + array.get(id).id);
-                    sqLiteDatabase.close();
-                    myDataBaseTownHelper.close();
-
-                    MyDataBaseHelper myDataBaseHelper = new MyDataBaseHelper(getApplicationContext());
-                    sqLiteDatabase = myDataBaseHelper.getWritableDatabase();
-                    sqLiteDatabase.delete(MyDataBaseHelper.DATABASE_NAME, MyDataBaseHelper._ID + "=" + id, null);
-                    sqLiteDatabase.close();
-                    myDataBaseHelper.close();
-                }
-            });
-            builder.setNegativeButton(R.string.NoDelete, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                }
-            });
-            AlertDialog dialog = builder.create();
+            getIntent().putExtra(Town._ID, array.get(position).id);
+            if (null == array.get(position).woeid || "".equals(array.get(position)))
+                getIntent().putExtra(Town.WOEID, "");
+            else
+                getIntent().putExtra(Town.WOEID, array.get(position).woeid);
+            DialogFragment newFragment = new MyAlertDialogFragment();
+            newFragment.show(getFragmentManager(), "dialog");
 
             return true;
         }
@@ -138,6 +162,9 @@ public class MyActivity extends Activity {
         listView.setOnItemLongClickListener(deleteTown);
 
         adapter.notifyDataSetChanged();
+
+        getIntent().putExtra(Town.WOEID, "");
+        getIntent().putExtra(Town._ID, 0);
     }
 
     @Override
@@ -175,10 +202,10 @@ public class MyActivity extends Activity {
         Intent intent = new Intent(getApplicationContext(), UpdatingService.class);
         intent.putExtra(UpdatingService.ALL_ID, true);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 109023421, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 109023421, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, AlarmManager.INTERVAL_HALF_HOUR, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 15000, AlarmManager.INTERVAL_HALF_HOUR, pendingIntent);
 
     }
 }

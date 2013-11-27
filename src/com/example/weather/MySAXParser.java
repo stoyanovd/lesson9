@@ -10,8 +10,7 @@ public class MySAXParser extends DefaultHandler {
     String encode = "utf-8";
     String defaultEncoding = "ISO-8859-1";
 
-    MySAXParser()
-    {
+    MySAXParser() {
         array = new ArrayList<Object>();
     }
 }

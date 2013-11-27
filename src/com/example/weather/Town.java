@@ -23,4 +23,5 @@ public class Town {
     public boolean fakeTown() {
         return ("".equals(woeid) || "".equals(name) || (null == woeid) || (null == name));
     }
+
 }

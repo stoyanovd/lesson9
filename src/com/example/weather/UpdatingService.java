@@ -58,7 +58,7 @@ public class UpdatingService extends IntentService {
 
         for (int i = 0; i < array.size(); i++) {
             if (allId || town.id == array.get(i).id) {
-                TownUpdater townUpdater = new TownUpdater(array.get(i), getApplicationContext());
+                TownUpdater townUpdater = new TownUpdater(array.get(i).woeid, getApplicationContext());
                 try {
                     townUpdater.update();
                 } catch (Exception e) {

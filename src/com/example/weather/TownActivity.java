@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.view.LayoutInflater;
@@ -31,7 +30,7 @@ public class TownActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.dayitem, parent, false);
+            View rowView = inflater.inflate(R.layout.dayitem, null);
             TextView textViewDate = (TextView) rowView.findViewById(R.id.textViewDate);
             TextView textViewLow = (TextView) rowView.findViewById(R.id.textViewLow);
             TextView textViewHigh = (TextView) rowView.findViewById(R.id.textViewHigh);
@@ -46,13 +45,15 @@ public class TownActivity extends Activity {
                 return rowView;
             }
 
-            textViewDate.setText(item.date);
+            Time time = new Time();
+            time.set(Long.parseLong(item.date));
+            textViewDate.setText(time.format3339(true));
             textViewLow.setText(item.low_temperature);
             textViewHigh.setText(item.high_temperature);
             textViewClouds.setText(item.clouds);
 
-            Uri uri = Uri.parse("R.drawable.w" + item.image);             ///           Is it working?
-            imageView.setImageURI(uri);
+            imageView.setImageResource(getResources().getIdentifier("w" + item.image, "drawable", getPackageName()));
+
             return rowView;
         }
     }
@@ -110,10 +111,13 @@ public class TownActivity extends Activity {
         townName = getIntent().getStringExtra(Town.NAME);
         townWOEID = getIntent().getStringExtra(Town.WOEID);
 
-        MyDataBaseTownHelper myDataBaseTownHelper = new MyDataBaseTownHelper(getApplicationContext(), townId);
-        SQLiteDatabase sqLiteDatabase = myDataBaseTownHelper.getReadableDatabase();
+        MyDataBaseTownHelper myDataBaseTownHelper = new MyDataBaseTownHelper(getApplicationContext(), townWOEID);
+        SQLiteDatabase sqLiteDatabase = myDataBaseTownHelper.getWritableDatabase();
 
-        Cursor cursor = sqLiteDatabase.query(MyDataBaseTownHelper.DATABASE_NAME_NO_ID + townId, null, null,
+        boolean sqb = (sqLiteDatabase == null);
+        System.out.println("sq " + sqb) ;
+
+        Cursor cursor = sqLiteDatabase.query(MyDataBaseTownHelper.DATABASE_NAME_NO_ID + townWOEID, null, null,
                 null, null, null, null);
 
         int date_column = cursor.getColumnIndex(MyDataBaseTownHelper.DATE);
@@ -127,13 +131,17 @@ public class TownActivity extends Activity {
         int image_column = cursor.getColumnIndex(MyDataBaseTownHelper.IMAGE);
 
         array = new ArrayList<Day>();
-
+        Time now = new Time();
+        now.setToNow();
+        System.out.println(" now = " + now.toString());
         while (cursor.moveToNext()) {
-            Time now = new Time();
-            now.setToNow();
-            Time current = new Time(cursor.getString(date_column));
+
+            Time current = new Time();
+            current.set(Long.parseLong(cursor.getString(date_column)));
+            System.out.println(" checking date: " + current.toString());
             if (now.after(current) && (now.yearDay > current.yearDay || now.year > current.year))
                 continue;
+            System.out.println(" nice day " + current.toString());
             array.add(new Day(cursor.getString(date_column), cursor.getString(humidity_column),
                     cursor.getString(pressure_column), cursor.getString(wind_direction_column), cursor.getString(wind_speed_column),
                     cursor.getString(low_temperature_column), cursor.getString(high_temperature_column), cursor.getString(clouds_column),
@@ -156,6 +164,9 @@ public class TownActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(UpdatingService.UPDATING_ACTION + "_" + townName);
+        registerReceiver(mMessageReceiver, intentFilter);
         makingList();
     }
 

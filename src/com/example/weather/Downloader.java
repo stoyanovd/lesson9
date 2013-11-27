@@ -98,10 +98,10 @@ public class Downloader {
         return res;
     }
 
-    public Downloader()
-    {
+    public Downloader() {
         successfulDownload = false;
     }
+
     public Downloader(String url, MySAXParser saxParser) throws ParserConfigurationException, XmlPullParserException, SAXException, IOException {
 
         try {

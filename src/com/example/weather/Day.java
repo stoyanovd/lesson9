@@ -45,4 +45,17 @@ public class Day {
         clouds = _clouds;
         image = _image;
     }
+
+    public void println() {
+        System.out.println();
+        System.out.println("date = " + date +
+                " humidity = " + humidity +
+                " pressure = " + pressure +
+                " wind_direction = " + wind_direction +
+                " wind_speed = " + wind_speed);
+        System.out.println("low_temperature = " + low_temperature +
+                " high_temperature = " + high_temperature +
+                " clouds = " + clouds +
+                " image = " + image);
+    }
 }
